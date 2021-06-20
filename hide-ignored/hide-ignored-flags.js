@@ -1,31 +1,67 @@
 // ==UserScript==
 // @name         Hide the Ignored
-// @homepage     https://gist.github.com/Bhargav-Rao/fd4202b609b9610f2aeb3df350513be7
-// @version      0.2
-// @description  Hides those posts that you've already seen in the queue
+// @namespace    http://bhargavrao.com
+// @version      1.0
+// @description  Hides those posts that you've already seen in the flag dashboard
 // @author       bhargavrao
+// @author       Glorfindel
+// @match        *://*.stackexchange.com/admin/*
 // @match        *://*.stackoverflow.com/admin/*
+// @match        *://*.stackapps.com/admin/*
+// @match        *://*.askubuntu.com/admin/*
+// @match        *://*.superuser.com/admin/*
+// @match        *://*.serverfault.com/admin/*
+// @match        *://*.mathoverflow.net/admin/*
+// @include      *://*.stackexchange.com/admin/*
 // @include      *://*.stackoverflow.com/admin/*
+// @include      *://*.stackapps.com/admin/*
+// @include      *://*.askubuntu.com/admin/*
+// @include      *://*.superuser.com/admin/*
+// @include      *://*.serverfault.com/admin/*
+// @include      *://*.mathoverflow.net/admin/*
 // @grant        none
 // ==/UserScript==
 
 (function() {
-    $('.s-sidebarwidget:first').append('<div class="s-sidebarwidget--content sm:pt8 sm:pb8"><fieldset><div class="grid gs8 gsx"><div class="grid--cell"><input class="s-checkbox" id="hide-ignored" type="checkbox"></div><div class="grid--cell"><div class="s-label fw-normal"><span>Hide Ignored Posts</span><p class="js-toggle-apply-filters s-description sm:d-none">Hide posts that you have already visited</p></div></div></div></fieldset></div>')
-    $('#hide-ignored').change(
-            function(){
-                if ($(this).is(':checked')) {
-                    $(".visited-post").each(
-                        function(index){
-                            $(this).hide();
-                        }
-                    );
-                }
-                if ($(this).is(':checkbox:not(:checked)')) {
-                    $(".visited-post").each(
-                        function(index){
-                            $(this).show();
-                        }
-                    );
-                }
-            });
+  // Event handler
+  let onChange = function(newValue) {
+    // Remember value
+    if (newValue) {
+      window.localStorage.setItem("HideTheIgnored", true);
+    } else {
+      window.localStorage.removeItem("HideTheIgnored");
+    }
+    // Show/hide visited posts
+    $(".visited-post").each(function(index) {
+      if (newValue) {
+        $(this).hide();
+      } else {
+        $(this).show();
+      }
+    });
+  };
+  
+  // Add checkbox and label
+  let grid = $("input.js-toggle-apply-filters").parents("fieldset");
+  grid.append(`
+                                <div class="grid gs8 gsx">
+                                    <div class="grid--cell">
+                                        <input class="js-toggle-apply-filters s-checkbox hide-ignored" type="checkbox" id="hide-ignored">
+                                    </div>
+                                    <div class="grid--cell">
+                                        <div class="s-label fw-normal">
+                                            <label for="hide-ignored">Hide ignored posts</label>
+                                            <p class="js-toggle-apply-filters s-description sm:d-none">Hide posts that you have already visited</p>
+                                        </div>
+                                    </div>
+                                </div>`);  
+  $("#hide-ignored").change(function() {
+    onChange($(this).is(":checked"));
+  });
+  
+  // Determine initial state
+  if (window.localStorage.getItem("HideTheIgnored")) {
+    $("#hide-ignored").prop("checked", true);
+    onChange(true);
+  }
 })();
