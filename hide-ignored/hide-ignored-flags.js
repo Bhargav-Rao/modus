@@ -42,11 +42,11 @@
   };
   
   // Add checkbox and label
-  let grid = $("input.js-toggle-apply-filters").parent().parent().parent();
+  let grid = $("input.js-toggle-apply-filters").parents("fieldset");
   grid.append(`
                                 <div class="grid gs8 gsx">
                                     <div class="grid--cell">
-                                        <input class="s-checkbox hide-ignored" type="checkbox" id="hide-ignored">
+                                        <input class="js-toggle-apply-filters s-checkbox hide-ignored" type="checkbox" id="hide-ignored">
                                     </div>
                                     <div class="grid--cell">
                                         <div class="s-label fw-normal">
