@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Hide the Ignored
 // @namespace    http://bhargavrao.com
-// @version      1.2
+// @version      1.3
 // @description  Hides those posts that you've already seen in the flag dashboard
 // @author       bhargavrao
 // @author       Glorfindel
@@ -106,14 +106,16 @@ const storageKeyToggle = "HideTheIgnored", storageKeyPostIDs = "HideTheIgnored-P
   });
   
   // Determine initial state of ignore checkboxes
+  let parameters = new URL(location.href).searchParams;
+  let hasFilter = parameters.has("filtered") || parameters.has("flags") || parameters.has("flagtype");
   ignoredPostIDs = window.localStorage.getItem(storageKeyPostIDs) == null ? new Set()
     : new Set(window.localStorage.getItem(storageKeyPostIDs).split(","));
   for (let postID of ignoredPostIDs) {
-    if ($("#ignore-" + postID).length == 0) {
+    if ($("#ignore-" + postID).length > 0) {
+      $("#ignore-" + postID).prop("checked", true);
+    } else if (!hasFilter) {
       // post no longer flagged, forget about it
       ignoredPostIDs.delete(postID);  
-    } else {
-      $("#ignore-" + postID).prop("checked", true);
     }
   }
   window.localStorage.setItem(storageKeyPostIDs, [...ignoredPostIDs].join());
